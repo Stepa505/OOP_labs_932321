@@ -12,8 +12,6 @@ Fraction::Fraction(int denominator, int numerator) {
 	m_numerator = numerator;
 }
 
-Fraction::~Fraction() {}
-
 Fraction Fraction::Summation(Fraction a) {
 	m_denominator = m_denominator * a.m_denominator;
 	m_numerator = m_numerator * a.m_denominator + a.m_numerator * m_denominator;
@@ -37,4 +35,36 @@ Fraction Fraction::Division(Fraction a) {
 	m_denominator *= a.m_numerator;
 	return *this;
 
+}
+
+void Fraction::operator +(Fraction a) {
+	Summation(a);
+}
+
+void Fraction::operator -(Fraction a) {
+	Substraction(a);
+}
+
+void Fraction::operator *(Fraction a) {
+	Multiplication(a);
+}
+
+void Fraction::operator /(Fraction a) {
+	Division(a);
+}
+
+bool Fraction::operator ==(Fraction a) {
+	return (m_numerator == a.m_numerator && m_denominator == a.m_denominator);
+}
+
+bool Fraction::operator !=(Fraction a) {
+	return ((m_numerator / m_denominator) != (a.m_denominator / a.m_denominator));
+}
+
+bool Fraction::operator >(Fraction a) {
+	return ((m_numerator / m_denominator) > (a.m_denominator / a.m_denominator));
+}
+
+bool Fraction::operator <(Fraction a) {
+	return ((m_numerator / m_denominator) < (a.m_denominator / a.m_denominator));
 }
