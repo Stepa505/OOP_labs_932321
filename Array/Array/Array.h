@@ -6,7 +6,7 @@ class Array
 public:
 	Array();
 	~Array();
-	Array(const Array& arr);
+	Array(const Array& arr, int size);
 	Array(const ItemType* arr);
 	int Size() const;
 	void Swap(Array& other);
