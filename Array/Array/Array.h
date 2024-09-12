@@ -3,6 +3,7 @@
 template <typename ItemType>
 class Array
 {
+public:
 	Array();
 	~Array();
 	Array(const Array& arr);
@@ -25,7 +26,8 @@ class Array
 	Array& operator +=(const ItemType& value);
 	bool operator !=(const Array& arr) const;
 	bool operator ==(const Array& arr) const;
-
-
+private:
+	ItemType* m_array = nullptr;
+	int size = 0;
 };
 
