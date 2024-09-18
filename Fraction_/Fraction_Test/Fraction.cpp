@@ -6,13 +6,13 @@
 Fraction::Fraction(const int numerator, const int denominator) {
 	m_denominator = denominator;
 	m_numerator = numerator;
-	IsValid();
+	IsDenominatorPosible();
 }
 
 Fraction::Fraction(const Fraction& c) {
 	SetDenominator(c.m_denominator);
 	SetNumerator(c.m_numerator);
-	IsValid();
+	IsDenominatorPosible();
 }
 
 Fraction Fraction::Summation(const Fraction& a) const{
@@ -77,7 +77,7 @@ bool Fraction::IsCorrect() const{
 
 void Fraction::SetDenominator(int denominator){
 	m_denominator = denominator;
-	IsValid();
+	IsDenominatorPosible();
 }
 
 void Fraction::SetNumerator(int numerator) {
@@ -118,11 +118,11 @@ Fraction Fraction::Reduction() {
 	return c;
 }
 
-void Fraction::IsValid() const {
+void Fraction::IsDenominatorPosible() {
 	if (m_denominator == 0) {
-		std::cerr << "Error: denominator can't be '0'; check the incoming values";
+		std::cerr << "Error: denominator is '0'; check the incoming values; now denominator is INT_MAX";
+		m_denominator = INT_MAX;
 	}
-	exit(0);
 }
 
 Fraction Fraction::operator +(const Fraction& a) const {
@@ -164,6 +164,6 @@ std::ostream& operator<<(std::ostream& out, const Fraction& c) {
 
 std::istream& operator>>(std::istream& in, Fraction& c) {
 	in >> c.m_numerator >> c.m_denominator;
-	c.IsValid();
+	c.IsDenominatorPosible();
 	return in;
 }

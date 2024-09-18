@@ -22,7 +22,7 @@ public:
 	int GetNumerator() const;
 	int GetDenominator() const;
 	int GCD() const;
-	void IsValid() const;
+	void IsDenominatorPosible();
 	Fraction operator *(const Fraction& a) const;
 	Fraction operator +(const Fraction& a) const;
 	Fraction operator -(const Fraction& a) const;
