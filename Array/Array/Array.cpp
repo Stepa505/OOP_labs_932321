@@ -71,7 +71,17 @@ int Array<ItemType>::FindValueFirst(const ItemType& value) const{
 
 template<typename ItemType>
 void Array<ItemType>::Sort() {
-
+	Array<ItemType> arr_sort(*this);
+	int l = 0, r = m_size - 1;
+	while (r > l) {
+		m_array[l] = arr_sort.Min();
+		m_array[r] = arr_sort.Max();
+		arr_sort.DeleteValue(arr_sort.Min());
+		arr_sort.DeleteValue(arr_sort.Max());
+		l++;
+		r--;
+	}
+	if (r == l) m_array[r] = arr_sort.m_array[0];
 }
 
 template<typename ItemType>
