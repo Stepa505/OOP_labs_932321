@@ -34,8 +34,8 @@ Array<ItemType>::Array(const Array& other) {
 }
 
 template<typename ItemType>
-Array<ItemType>::Array(const ItemType* arr) {
-	m_size = int(sizeof(arr));
+Array<ItemType>::Array(const ItemType* arr, int size) {
+	m_size = size;
 	m_array = new ItemType[m_size];
 	for (int i = 0; i < m_size; i++) {
 		m_array[i] = arr[i];
@@ -271,75 +271,77 @@ std::istream& operator >>(std::istream& in, Array<ItemType>& arr) {
 	return in;
 }
 
-//template<typename ItemType>
-//template<typename AT, typename IT>
-//Array<ItemType>::Iterator<AT, IT>::Iterator(AT* array, int position):
-//m_array(array),
-//m_pos(position)
-//{
-//}
-//
-//template<typename ItemType>
-//template<typename AT, typename IT>
-//IT Array<ItemType>::Iterator<AT, IT>::operator *() {
-//	return m_array[m_pos];
-//}
-//
-//template<typename ItemType>
-//template<typename AT, typename IT>
-//Array<ItemType>::Iterator<AT, IT>& Array<ItemType>::Iterator<AT, IT>::operator ++() {
-//	m_pos++;
-//	return *this;
-//}
-//
-//template<typename ItemType>
-//template<typename AT, typename IT>
-//Array<ItemType>::Iterator<AT, IT>& Array<ItemType>::Iterator<AT, IT>::operator --() {
-//	m_pos--;
-//	return *this;
-//}
-//
-//template<typename ItemType>
-//template<typename AT, typename IT>
-//Array<ItemType>::Iterator<AT, IT>& Array<ItemType>::Iterator<AT, IT>::operator ++(int) {
-//	m_pos++;
-//	return *this;
-//}
-//
-//template<typename ItemType>
-//template<typename AT, typename IT>
-//Array<ItemType>::Iterator<AT, IT>& Array<ItemType>::Iterator<AT, IT>::operator --(int) {
-//	m_pos--;
-//	return *this;
-//}
-//
-//template<typename ItemType>
-//template<typename AT, typename IT>
-//int Array<ItemType>::Iterator<AT, IT>::Positon() const {
-//	return m_pos;
-//}
-//
-//template<typename ItemType>
-//template<typename AT, typename IT>
-//bool Array<ItemType>::Iterator<AT, IT>::operator ==(const Iterator& other) const{
-//	assert(m_array == other.m_array);
-//	return (m_pos == other.m_pos);
-//}
-//
-//template<typename ItemType>
-//template<typename AT, typename IT>
-//bool Array<ItemType>::Iterator<AT, IT>::operator !=(const Iterator& other) const {
-//	return (m_array != other.m_array || m_pos != other.m_pos);
-//}
-//
-//template<typename ItemType>
-//Array<ItemType>::TmpIterator Array<ItemType>::Begin() {
-//	return TmpIterator(this, 0);
-//}
-//
-//template<typename ItemType>
-//Array<ItemType>::TmpIterator Array<ItemType>::End() {
-//	return TmpIterator(this, m_size);
-//}
+template<typename ItemType>
+template<typename AT, typename IT>
+Array<ItemType>::Iterator<AT, IT>::Iterator(AT* array, int position):
+m_array(array),
+m_pos(position)
+{
+}
+
+template<typename ItemType>
+template<typename AT, typename IT>
+IT Array<ItemType>::Iterator<AT, IT>::operator *() {
+	return m_array[m_pos];
+}
+
+template<typename ItemType>
+template<typename AT, typename IT>
+Array<ItemType>::Iterator<AT, IT>& Array<ItemType>::Iterator<AT, IT>::operator ++() {
+	m_pos++;
+	return *this;
+}
+
+template<typename ItemType>
+template<typename AT, typename IT>
+Array<ItemType>::Iterator<AT, IT>& Array<ItemType>::Iterator<AT, IT>::operator --() {
+	m_pos--;
+	return *this;
+}
+
+template<typename ItemType>
+template<typename AT, typename IT>
+Array<ItemType>::Iterator<AT, IT>& Array<ItemType>::Iterator<AT, IT>::operator ++(int) {
+	m_pos++;
+	return *this;
+}
+
+template<typename ItemType>
+template<typename AT, typename IT>
+Array<ItemType>::Iterator<AT, IT>& Array<ItemType>::Iterator<AT, IT>::operator --(int) {
+	m_pos--;
+	return *this;
+}
+
+template<typename ItemType>
+template<typename AT, typename IT>
+int Array<ItemType>::Iterator<AT, IT>::Positon() const {
+	return m_pos;
+}
+
+template<typename ItemType>
+template<typename AT, typename IT>
+bool Array<ItemType>::Iterator<AT, IT>::operator ==(const Iterator& other) const{
+	assert(m_array == other.m_array);
+	return (m_pos == other.m_pos);
+}
+
+template<typename ItemType>
+template<typename AT, typename IT>
+bool Array<ItemType>::Iterator<AT, IT>::operator !=(const Iterator& other) const {
+	return (m_array != other.m_array || m_pos != other.m_pos);
+}
+
+template<typename ItemType>
+template<typename AT, typename IT>
+Array<ItemType>::Iterator<AT, IT> Array<ItemType>::Begin() {
+	return Array<ItemType>::Iterator<AT, IT>(this, 0);
+}
+
+template<typename ItemType>
+template<typename AT, typename IT>
+Array<ItemType>::Iterator<AT, IT> Array<ItemType>::End() {
+	return Array<ItemType>::Iterator<AT, IT>(this, 0);
+}
 
 #endif 

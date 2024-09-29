@@ -1,18 +1,18 @@
 #pragma once
 #include <iostream>
-
+#include <assert.h>
 template <typename ItemType>
 class Array
 {
 public:
 	template<typename AT, typename IT>
 	class Iterator;
-	typedef Iterator<Array, ItemType> TmpIterator;
+	//typedef Iterator<Array, ItemType> TmpIterator;
 public:
 	~Array();
 	Array(const ItemType& value = ItemType(), int size = 10);
 	Array(const Array& other);
-	Array(const ItemType* arr);
+	Array(const ItemType* arr, int size);
 	int Size() const;
 	void Swap(Array& other);
 	int FindValueFirst(const ItemType& value) const;
@@ -33,8 +33,12 @@ public:
 	bool operator ==(const Array& arr) const;
 	//TmpIterator Begin();
 	//TmpIterator End();
-	//void DeleteIterator();
-	//void DeleteIteratorRange();
+	template<typename AT, typename IT>
+	Array::Iterator<AT, IT> Begin();
+	template<typename AT, typename IT>
+	Array::Iterator<AT, IT> End();
+	void DeleteIterator();
+	void DeleteIteratorRange();
 private:
 	ItemType* m_array = nullptr;
 	int m_size = 0;
@@ -47,24 +51,24 @@ std::istream& operator >>(std::istream& in, Array<ItemType>& arr);
 
 
 
-//template<typename ItemType>
-//template<typename AT, typename IT>
-//class Array<ItemType>::Iterator {
-//public:
-//	Iterator(AT* array = nullptr, int position = 0);
-//	IT operator *();
-//	Iterator& operator ++();
-//	Iterator& operator --();
-//	Iterator& operator ++(int);
-//	Iterator& operator --(int);
-//	int Positon() const;
-//	bool operator ==(const Iterator& other) const;
-//	bool operator !=(const Iterator& other) const;
-//
-//private:
-//	AT* m_array;
-//	int m_pos = 0;
-//};
+template<typename ItemType>
+template<typename AT, typename IT>
+class Array<ItemType>::Iterator {
+public:
+	Iterator(AT* array = nullptr, int position = 0);
+	IT operator *();
+	Iterator& operator ++();
+	Iterator& operator --();
+	Iterator& operator ++(int);
+	Iterator& operator --(int);
+	int Positon() const;
+	bool operator ==(const Iterator& other) const;
+	bool operator !=(const Iterator& other) const;
+
+private:
+	AT* m_array;
+	int m_pos = 0;
+};
 
 #include "Array.cpp"
 

@@ -3,10 +3,11 @@
 #include <assert.h>
 
 int main() {
-	Array<int> arr(12, 10), arr2(38, 7), arr1;
-	//Array<int>::TmpIterator iter = arr.Begin();
-	arr1 = arr;
-	//std::cout << *iter;
+	Array<int> arr(12, 10), arr2(38, 7), arr1(arr);
+	int conv[5] = { 11, 12, 3, 8, 6 };
+	Array<int> arr_type(conv, 5);
+	//Array<int>::Iterator<int, int*> iter_begin(arr, 0);
+	std::cout << arr_type;
 	std::cout << "\n";
 	std::cout << arr;
 	arr.DeleteIndex(2);
@@ -39,5 +40,4 @@ int main() {
 	std::cout << "arr1[9] = " << arr1[9];
 	arr1 += 99;
 	std::cout << "arr1[10] = " << arr1[10];
-
 }
