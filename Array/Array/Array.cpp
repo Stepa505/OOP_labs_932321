@@ -1,5 +1,8 @@
+#ifndef ARRAY_TEMPLATE
+#define ARRAY_TEMPLATE
 #include "Array.h"
 #include <iostream>
+#include <assert.h>
 
 template<typename ItemType>
 Array<ItemType>::Array(const ItemType& value, const int size) {
@@ -32,7 +35,7 @@ Array<ItemType>::Array(const Array& other) {
 
 template<typename ItemType>
 Array<ItemType>::Array(const ItemType* arr) {
-	m_size = sizeof(arr);
+	m_size = int(sizeof(arr));
 	m_array = new ItemType[m_size];
 	for (int i = 0; i < m_size; i++) {
 		m_array[i] = arr[i];
@@ -46,19 +49,8 @@ int Array<ItemType>::Size() const{
 
 template<typename ItemType>
 void Array<ItemType>::Swap(Array& other) {
-	Array arr1(*this), arr2(other);
-	m_size = arr2.m_size;
-	other.m_size = arr1.m_size;
-	delete[] m_array;
-	delete[] other.m_array;
-	m_array = new ItemType[m_size];
-	other.m_array = new ItemType[other.m_size];
-	for (int i = 0; i < m_size; i++) {
-		m_array[i] = arr2.m_array[i];
-	}
-	for (int i = 0; i < other.m_size; i++) {
-		other.m_array[i] = arr1.m_array[i];
-	}
+	std::swap(m_array, other.m_array);
+	std::swap(m_size, other.m_size);
 }
 
 template<typename ItemType>
@@ -86,29 +78,38 @@ void Array<ItemType>::Sort() {
 
 template<typename ItemType>
 bool Array<ItemType>::InsertIndex(int index, const ItemType& value) {
-	if (index > m_size || index < 0) {
-		std::cerr << "Array::InsertIndex: index is out of array";
+	if (index >= m_size || index < 0) {
 		return false;
 	}
+	Array<ItemType> arr(*this);
+	delete[] m_array;
+	m_size ++;
+	m_array = new ItemType[m_size];
+	int i;
+	for (i = 0; i < index; i++) {
+		m_array[i] = arr.m_array[i];
+	}
 	m_array[index] = value;
+	for (i = index + 1; i < m_size; i++) {
+		m_array[i] = arr.m_array[i - 1];
+	}
 	return true;
 }
 
 template<typename ItemType>
 bool Array<ItemType>::DeleteIndex(int index) {
-	if (index > m_size || index < 0) {
-		std::cerr << "Array::InsertIndex: index is out of array";
+	if (index >= m_size || index < 0) {
 		return false;
 	}
 	Array arr(*this);
 	delete[] m_array;
 	m_size--;
 	m_array = new ItemType[m_size];
-	int i = 0;
-	for (i; i < index - 1; i++) {
+	int i;
+	for (i = 0; i < index; i++) {
 		m_array[i] = arr.m_array[i];
 	}
-	for (i; i < m_size; i++) {
+	for (i = index; i < m_size; i++) {
 		m_array[i] = arr.m_array[i + 1];
 	}
 	return true;
@@ -117,7 +118,7 @@ bool Array<ItemType>::DeleteIndex(int index) {
 template<typename ItemType>
 bool Array<ItemType>::DeleteValue(const ItemType& value) {
 	int i = FindValueFirst(value);
-	if (!i) return false;
+	if (i == -1) return false;
 	else {
 		DeleteIndex(i);
 		return true;
@@ -128,7 +129,7 @@ template<typename ItemType>
 bool Array<ItemType>::DeleteAllValue(const ItemType& value) {
 	int k = 0, i;
 	do {
-		int i = DeleteValue(value);
+		i = DeleteValue(value);
 		k++;
 	} while (i);
 	if (k == 0) return false;
@@ -136,7 +137,8 @@ bool Array<ItemType>::DeleteAllValue(const ItemType& value) {
 }
 
 template<typename ItemType>
-ItemType Array<ItemType>::Max() {
+ItemType Array<ItemType>::Max() const{
+	assert(m_array != nullptr);
 	ItemType* iter = &m_array[0];
 	for (int i = 1; i < m_size; i++) {
 		if (*iter < m_array[i]) iter = &m_array[i];
@@ -145,7 +147,8 @@ ItemType Array<ItemType>::Max() {
 }
 
 template<typename ItemType>
-ItemType Array<ItemType>::Min() {
+ItemType Array<ItemType>::Min() const{
+	assert(m_array != nullptr);
 	ItemType* iter = &m_array[0];
 	for (int i = 1; i < m_size; i++) {
 		if (*iter > m_array[i]) iter = &m_array[i];
@@ -154,7 +157,7 @@ ItemType Array<ItemType>::Min() {
 }
 
 template<typename ItemType>
-ItemType& Array<ItemType>::operator [](const int index) {
+ItemType& Array<ItemType>::operator [](const int index) const{
 	if (index >= m_size || index < 0) {
 		std::cerr << "Array::operator []: index out of range";
 	}
@@ -162,7 +165,8 @@ ItemType& Array<ItemType>::operator [](const int index) {
 }
 
 template<typename ItemType>
-Array<ItemType> Array<ItemType>::operator =(const Array& other) {
+Array<ItemType>& Array<ItemType>::operator =(const Array& other) {
+	assert(*this != other);
 	delete[] m_array;
 	m_size = other.m_size;
 	m_array = new ItemType[m_size];
@@ -246,11 +250,11 @@ bool Array<ItemType>::operator ==(const Array& other) const {
 
 template<typename ItemType>
 std::ostream& operator <<(std::ostream& out, const Array<ItemType>& arr) {
-	out << "[ ";
-	for (int i = 0; i < arr.m_size; i++) {
-		out << arr.m_array[i] << " ,";
+	out << "[";
+	for (int i = 0; i < arr.Size() - 1; i++) {
+		std::cout << arr[i] << ",";
 	}
-	out << " ]";
+	std::cout << arr[arr.Size() - 1] << "]\n";
 	return out;
 }
 
@@ -258,11 +262,84 @@ template<typename ItemType>
 std::istream& operator >>(std::istream& in, Array<ItemType>& arr) {
 	in >> arr.m_size;
 	if (arr.m_size < 0) {
-		std::cerr << "operator <<:: size can't be negative";
-		exit(0);
+		std::cerr << "operator <<:: size can't be negative; inverting size";
+		arr.m_size = -arr.Size();
 	}
 	for (int i = 0; i < arr.m_size; i++) {
-		in >> arr.m_array[i];
+		in >> arr[i];
 	}
 	return in;
 }
+
+//template<typename ItemType>
+//template<typename AT, typename IT>
+//Array<ItemType>::Iterator<AT, IT>::Iterator(AT* array, int position):
+//m_array(array),
+//m_pos(position)
+//{
+//}
+//
+//template<typename ItemType>
+//template<typename AT, typename IT>
+//IT Array<ItemType>::Iterator<AT, IT>::operator *() {
+//	return m_array[m_pos];
+//}
+//
+//template<typename ItemType>
+//template<typename AT, typename IT>
+//Array<ItemType>::Iterator<AT, IT>& Array<ItemType>::Iterator<AT, IT>::operator ++() {
+//	m_pos++;
+//	return *this;
+//}
+//
+//template<typename ItemType>
+//template<typename AT, typename IT>
+//Array<ItemType>::Iterator<AT, IT>& Array<ItemType>::Iterator<AT, IT>::operator --() {
+//	m_pos--;
+//	return *this;
+//}
+//
+//template<typename ItemType>
+//template<typename AT, typename IT>
+//Array<ItemType>::Iterator<AT, IT>& Array<ItemType>::Iterator<AT, IT>::operator ++(int) {
+//	m_pos++;
+//	return *this;
+//}
+//
+//template<typename ItemType>
+//template<typename AT, typename IT>
+//Array<ItemType>::Iterator<AT, IT>& Array<ItemType>::Iterator<AT, IT>::operator --(int) {
+//	m_pos--;
+//	return *this;
+//}
+//
+//template<typename ItemType>
+//template<typename AT, typename IT>
+//int Array<ItemType>::Iterator<AT, IT>::Positon() const {
+//	return m_pos;
+//}
+//
+//template<typename ItemType>
+//template<typename AT, typename IT>
+//bool Array<ItemType>::Iterator<AT, IT>::operator ==(const Iterator& other) const{
+//	assert(m_array == other.m_array);
+//	return (m_pos == other.m_pos);
+//}
+//
+//template<typename ItemType>
+//template<typename AT, typename IT>
+//bool Array<ItemType>::Iterator<AT, IT>::operator !=(const Iterator& other) const {
+//	return (m_array != other.m_array || m_pos != other.m_pos);
+//}
+//
+//template<typename ItemType>
+//Array<ItemType>::TmpIterator Array<ItemType>::Begin() {
+//	return TmpIterator(this, 0);
+//}
+//
+//template<typename ItemType>
+//Array<ItemType>::TmpIterator Array<ItemType>::End() {
+//	return TmpIterator(this, m_size);
+//}
+
+#endif 
