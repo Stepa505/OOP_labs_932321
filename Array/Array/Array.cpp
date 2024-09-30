@@ -272,76 +272,110 @@ std::istream& operator >>(std::istream& in, Array<ItemType>& arr) {
 }
 
 template<typename ItemType>
-template<typename AT, typename IT>
-Array<ItemType>::Iterator<AT, IT>::Iterator(AT* array, int position):
+template<typename IT, typename AT>
+Array<ItemType>::Iterator<IT, AT>::Iterator(AT* array, int position):
 m_array(array),
 m_pos(position)
-{
+{}
+
+template<typename ItemType>
+template<typename IT, typename AT>
+IT& Array<ItemType>::Iterator<IT, AT>::operator *() {
+	return m_array->operator[](m_pos);
 }
 
 template<typename ItemType>
-template<typename AT, typename IT>
-IT Array<ItemType>::Iterator<AT, IT>::operator *() {
-	return m_array[m_pos];
-}
-
-template<typename ItemType>
-template<typename AT, typename IT>
-Array<ItemType>::Iterator<AT, IT>& Array<ItemType>::Iterator<AT, IT>::operator ++() {
+template<typename IT, typename AT>
+Array<ItemType>::Iterator<IT, AT>& Array<ItemType>::Iterator<IT, AT>::operator ++() {
 	m_pos++;
 	return *this;
 }
 
 template<typename ItemType>
-template<typename AT, typename IT>
-Array<ItemType>::Iterator<AT, IT>& Array<ItemType>::Iterator<AT, IT>::operator --() {
+template<typename IT, typename AT>
+Array<ItemType>::Iterator<IT, AT>& Array<ItemType>::Iterator<IT, AT>::operator --() {
 	m_pos--;
 	return *this;
 }
 
 template<typename ItemType>
-template<typename AT, typename IT>
-Array<ItemType>::Iterator<AT, IT>& Array<ItemType>::Iterator<AT, IT>::operator ++(int) {
+template<typename IT, typename AT>
+Array<ItemType>::Iterator<IT, AT>& Array<ItemType>::Iterator<IT, AT>::operator ++(int) {
+	auto old(*this);
 	m_pos++;
-	return *this;
+	return old;
 }
 
 template<typename ItemType>
-template<typename AT, typename IT>
-Array<ItemType>::Iterator<AT, IT>& Array<ItemType>::Iterator<AT, IT>::operator --(int) {
+template<typename IT, typename AT>
+Array<ItemType>::Iterator<IT, AT>& Array<ItemType>::Iterator<IT, AT>::operator --(int) {
+	auto old(*this);
 	m_pos--;
-	return *this;
+	return old;
 }
 
 template<typename ItemType>
-template<typename AT, typename IT>
-int Array<ItemType>::Iterator<AT, IT>::Positon() const {
+template<typename IT, typename AT>
+int Array<ItemType>::Iterator<IT, AT>::Position() const {
 	return m_pos;
 }
 
 template<typename ItemType>
-template<typename AT, typename IT>
-bool Array<ItemType>::Iterator<AT, IT>::operator ==(const Iterator& other) const{
+template<typename IT, typename AT>
+bool Array<ItemType>::Iterator<IT, AT>::operator ==(const Iterator& other) const{
 	assert(m_array == other.m_array);
 	return (m_pos == other.m_pos);
 }
 
 template<typename ItemType>
-template<typename AT, typename IT>
-bool Array<ItemType>::Iterator<AT, IT>::operator !=(const Iterator& other) const {
+template<typename IT, typename AT>
+bool Array<ItemType>::Iterator<IT, AT>::operator !=(const Iterator& other) const {
 	return (m_array != other.m_array || m_pos != other.m_pos);
 }
 
-template<typename ItemType>
-template<typename AT, typename IT>
-Array<ItemType>::Iterator<AT, IT> Array<ItemType>::Begin() {
-	return Array<ItemType>::Iterator<AT, IT>(this, 0);
+/*а почему так то?*/
+template<typename ItemType> typename
+Array<ItemType>::TmpIterator Array<ItemType>::Begin() {
+	return TmpIterator (this, 0);
 }
 
-template<typename ItemType>
-template<typename AT, typename IT>
-Array<ItemType>::Iterator<AT, IT> Array<ItemType>::End() {
-	return Array<ItemType>::Iterator<AT, IT>(this, 0);
+/*и вот это почему так?*/
+template<typename ItemType> typename
+Array<ItemType>::TmpIterator Array<ItemType>::End() {
+	return TmpIterator (this, m_size);
+}
+
+/*а почему так то?*/
+template<typename ItemType> typename
+Array<ItemType>::ConstTmpIterator Array<ItemType>::Begin() const {
+	return ConstTmpIterator(this, 0);
+}
+
+/*и вот это почему так?*/
+template<typename ItemType> typename
+Array<ItemType>::ConstTmpIterator Array<ItemType>::End() const{
+	return ConstTmpIterator(this, m_size);
+}
+
+template<typename ItemType> typename
+void Array<ItemType>::DeleteIterator(TmpIterator iter) {
+	DeleteIndex(iter.Position());
+}
+
+template<typename ItemType> typename
+void Array<ItemType>::DeleteIteratorRange(TmpIterator leftIter, TmpIterator rightIter) {
+	/*проверить к этому ли массиву относяться итераторы*/
+	Array<ItemType> arr(*this);
+	delete[] m_array;
+	m_size = m_size - (rightIter.Position() - leftIter.Position()) - 1;
+	m_array = new ItemType[m_size];
+	TmpIterator iter;
+	for (iter = Begin(); iter != leftIter; iter++) {
+		*iter = arr.m_array[iter.Position()];
+	}
+	for (TmpIterator iterScore(&arr, rightIter.Position() + 1);iter != End(); iter++, iterScore++) {
+		*iter = arr.m_array[iterScore.Position()];
+	}
 }
 
 #endif 
