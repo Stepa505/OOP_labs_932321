@@ -24,21 +24,21 @@ public:
 	int Weight() const;
 	void Print() const;
 
-	BoolRank operator [](const int index);
-	const BoolRank operator [](const int index) const;
-
 	BoolVector operator &(const BoolVector& other) const;
-	BoolVector operator &=(const BoolVector& other);
+	BoolVector& operator &=(const BoolVector& other);
 	BoolVector operator |(const BoolVector& other) const;
 	BoolVector& operator |=(const BoolVector& other);
 	BoolVector operator ^(const BoolVector& other) const;
 	BoolVector& operator ^=(const BoolVector& other);
-	BoolVector operator >>(const int count) const;
+	BoolVector operator >>(const int count) ;
 	BoolVector& operator >>=(const int count);
-	BoolVector operator <<(const int count) const;
+	BoolVector operator <<(const int count) ;
 	BoolVector& operator <<=(const int count);
-	BoolVector& operator ~();
+	BoolVector operator ~();
 	BoolVector& operator =(const BoolVector& other);
+
+	BoolRank operator [](const int index);
+	const BoolRank operator [](const int index) const;
 private:
 	void m_twich();
 	const int m_cellSize = 8;

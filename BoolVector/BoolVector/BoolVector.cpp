@@ -20,7 +20,6 @@ BoolVector::BoolVector(const BoolVector& other)
 m_cellCount(other.m_cellCount),
 m_unsignificantRankCount(other.m_unsignificantRankCount)
 {
-	delete[] m_cells;
 	m_cells = new UC[m_length];
 	for (int i = 0; i < m_cellCount; i++) {
 		m_cells[i] = other.m_cells[i];
@@ -49,7 +48,7 @@ void BoolVector::InverseIndex(const int index) {
 	int current_pos = index % m_cellSize;
 	UC mask = 1;
 	mask <<= 7 - current_pos;
-	m_cells[current_cell] = ~(m_cells[current_pos] & mask);
+	m_cells[current_cell] = m_cells[current_pos] | mask;
 }
 
 void BoolVector::SetIndex(const int index, const bool value) {
@@ -64,12 +63,35 @@ void BoolVector::SetIndex(const int index, const bool value) {
 	else {
 		mask = ~mask;
 		m_cells[current_cell] = m_cells[current_cell] & mask;
+	}	
+}
+
+void BoolVector::SetInRange(const int left, const int right, const bool value) {
+	assert(left >= 0 && right < m_length && left < right);
+	for (int i = left; i < right + 1; i++) {
+		SetIndex(i, value);
 	}
 }
 
-//int BoolVector::Weight() const{
-//
-//}
+void BoolVector::SetAll(const bool value) {
+	BoolVector vector(m_length, value);
+	Swap(vector);
+}
+
+int BoolVector::Weight() const{
+	int k = 0;
+	UC mask = 1;
+	mask <<= 7;
+	for (int i = 0; i < m_cellCount; i++) {
+		for (int j = 0; j < m_cellSize; j++) {
+			k += (m_cells[i] & mask ? 1 : 0);
+			mask >>= 1;
+		}
+		mask = 1;
+		mask <<= 7;
+	}
+	return k;
+}
 
 void BoolVector::Print() const {
 	UC mask = 1;
@@ -89,7 +111,6 @@ void BoolVector::Print() const {
 	std::cout << std::endl;
 }
 
-
 void BoolVector::m_twich() {
 	if (m_cellCount == 0) {
 		return;
@@ -98,12 +119,106 @@ void BoolVector::m_twich() {
 	m_cells[m_cellCount - 1] <<= m_unsignificantRankCount;
 }
 
-//BoolVector::BoolRank BoolVector::operator [](const int index) {
-//	//UC* current_cell = &m_cells[index / m_cellSize + (index % m_cellSize ? 1 : 0)];
-//	//UC mask = 1;
-//	//mask <<= 
-//	//return *current_cell[index % m_cellSize];
+BoolVector BoolVector::operator &(const BoolVector& other) const{
+	assert(m_length == other.m_length);
+	BoolVector result(*this);
+	for (int i = 0; i < m_cellCount; i++) {
+		result.m_cells[i] &= other.m_cells[i];
+	}
+	return result;
+}
+
+BoolVector& BoolVector::operator &=(const BoolVector& other) {
+	assert(m_length == other.m_length);
+	for (int i = 0; i < m_cellCount; i++) {
+		m_cells[i] &= other.m_cells[i];
+	}
+	return *this;
+}
+
+BoolVector BoolVector::operator |(const BoolVector& other) const {
+	assert(m_length == other.m_length);
+	BoolVector result(*this);
+	for (int i = 0; i < m_cellCount; i++) {
+		result.m_cells[i] |= other.m_cells[i];
+	}
+	return result;
+}
+
+BoolVector& BoolVector::operator |=(const BoolVector& other) {
+	assert(m_length == other.m_length);
+	for (int i = 0; i < m_cellCount; i++) {
+		m_cells[i] |= other.m_cells[i];
+	}
+	return *this;
+}
+
+BoolVector BoolVector::operator ^(const BoolVector& other) const {
+	assert(m_length == other.m_length);
+	BoolVector result(*this);
+	for (int i = 0; i < m_cellCount; i++) {
+		result.m_cells[i] ^= other.m_cells[i];
+	}
+	return result;
+}
+
+BoolVector& BoolVector::operator ^=(const BoolVector& other) {
+	assert(m_length == other.m_length);
+	for (int i = 0; i < m_cellCount; i++) {
+		m_cells[i] ^= other.m_cells[i];
+	}
+	return *this;
+}
+
+BoolVector BoolVector::operator <<(const int count) {
+	int new_length = m_length + count;
+	//int new_unsignificantRankCount = m_cellSize - new_length % m_cellSize;
+	//int new_cellCount = new_length / m_cellSize + (new_length % m_cellSize ? 1 : 0);
+	BoolVector result(new_length, 0);
+	for (int i = 0; i < m_length; i++) {
+		result[i + count] = (*this)[i];
+	}
+	return result;
+}
+
+BoolVector::BoolRank BoolVector::operator [](const int index) {
+	assert(index >= 0 && index < m_length);
+	/*UC* current_cell = &m_cells[index / m_cellSize + (index % m_cellSize ? 1 : 0)];*/
+	//UC mask = 1;
+	//mask <<= 7 - index % m_cellSize;
+	return BoolVector::BoolRank(&m_cells[index / m_cellSize + (index % m_cellSize ? 1 : 0)], index % m_cellSize);
+}
+
+//const BoolVector::BoolRank BoolVector::operator [](const int index) const{
+//	UC* current_cell = &m_cells[index / m_cellSize + (index % m_cellSize ? 1 : 0)];
+//	UC mask = 1;
+//	mask <<= 7 - index % m_cellSize;
+//	return const BoolVector::BoolRank(current_cell, mask);
 //}
+
+BoolVector::BoolRank& BoolVector::BoolRank::operator =(const BoolRank& other) {
+	return *this = ((bool)other);
+}
+
+BoolVector::BoolRank& BoolVector::BoolRank::operator =(const bool value) {
+	if (value) {
+		*m_cell |= m_mask;
+	}
+	else {
+		*m_cell &= ~m_mask;
+	}
+	return *this;
+}
+
+BoolVector::BoolRank::operator bool() const {
+
+	if (m_mask & (*m_cell))
+		return true;
+
+	return false;
+}
+
+
 
 
 
