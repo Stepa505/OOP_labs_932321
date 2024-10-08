@@ -12,9 +12,9 @@ public:
 	BoolVector(const int length = 8, const bool value = true);
 	BoolVector(const char* vector);
 	BoolVector(const BoolVector& other);
-	~BoolVector();
+	~BoolVector() { delete[] m_cells; }
 
-	int GetLength() const;
+	int GetLength() const { return m_length; }
 	void Swap(BoolVector& other);
 	void Inverse();
 	void InverseIndex(const int index);
