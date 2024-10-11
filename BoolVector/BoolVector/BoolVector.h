@@ -3,10 +3,11 @@
 class BoolVector
 {
 	friend std::ostream& operator <<(std::ostream& out, const BoolVector& vector);
-	friend std::istream& operator >>(std::ostream& in, BoolVector& vector);
+	friend std::istream& operator >>(std::istream& in, BoolVector& vector);
 private:
 	class BoolRank;
 public:
+	static const int CellSize = 8;
 	using UC = unsigned char;
 public:
 	BoolVector(const int length = 8, const bool value = true);
@@ -30,11 +31,11 @@ public:
 	BoolVector& operator |=(const BoolVector& other);
 	BoolVector operator ^(const BoolVector& other) const;
 	BoolVector& operator ^=(const BoolVector& other);
-	BoolVector operator >>(const int count) ;
+	BoolVector operator >>(const int count) const;
 	BoolVector& operator >>=(const int count);
-	BoolVector operator <<(const int count) ;
+	BoolVector operator <<(const int count) const;
 	BoolVector& operator <<=(const int count);
-	BoolVector operator ~();
+	BoolVector operator ~() const;
 	BoolVector& operator =(const BoolVector& other);
 
 	BoolRank operator [](const int index);
@@ -62,9 +63,9 @@ public:
 	bool operator &(const bool value) const;
 	bool operator ^(const BoolRank& other) const;
 	bool operator ^(const bool value) const;
-	bool operator ~();
 	bool operator |(const BoolRank& other) const;
 	bool operator |(const bool value) const;
+	bool operator ~();
 
 	bool operator !=(const BoolRank& other) const;
 	bool operator !=(const bool value) const;
@@ -77,11 +78,40 @@ private:
 	UC m_mask = 1 << 7;
 };
 
-//std::ostream& operator <<(std::ostream& out, const BoolVector& vector) {
-//
-//}
-//
-//std::istream& operator >>(std::istream& in, BoolVector& vector) {
-//
-//}
+std::ostream& operator <<(std::ostream& out, const BoolVector& vector) {
+	uint8_t mask = 1;
+	mask <<= 7;
+	for (int j = 0; j <  vector.m_cellCount; j++) {
+		out << "[ ";
+		for (int i = 0; i < vector.m_cellSize; i++) {
+			if (vector.m_cells[j] & mask) out << "1 ";
+			else out << "0 ";
+			mask >>= 1;
+		}
+		mask = 1;
+		mask <<= 7;
+		out << ']';
+	}
+	std::cout << std::endl;
+	return out;
+}
+
+std::istream& operator >>(std::istream& in, BoolVector& vector) {
+	std::cout << "Eneter length of the vector: ";
+	in >> vector.m_length;
+	std::cout << std::endl;
+	std::cout << "Enter the vector, only 1 or 0: ";
+	bool value;
+	for (int i = 0; i < vector.m_length; i++) {
+		in >> value;
+		if (value) {
+			vector.SetIndex(i, 1);
+		}
+		else {
+			vector.SetIndex(i, 0);
+		}
+	}
+	std::cout << std::endl;
+	return in;
+}
 
