@@ -57,4 +57,28 @@ char Set::Min() const{
 	return (char)0;
 }
 
+Set& Set::operator = (const Set& other) {
+	BoolVector::operator=(other);
+	return *this;
+}
+
+bool Set::operator ==(const Set& other) const {
+	if (Capacity() != other.Capacity()) {
+		return false;
+	}
+	for (int i = 0; i < CHAR_MAX + 1; ++i) {
+		if (operator[](i) != other.operator[](i)) {
+			return false;
+		}
+	}
+	return true;
+}
+
+bool Set::operator !=(const Set& other) const {
+	return !(*this == other);
+}
+
+
+
+
 
