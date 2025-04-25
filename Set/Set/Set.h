@@ -12,8 +12,8 @@ class Set : private BoolVector
 
 	bool IsElementInSet(const char& element) const;
 	int Capacity() const;
-	char& Max();
-	char& Min();
+	char Max() const;
+	char Min() const;
 
 
 };
