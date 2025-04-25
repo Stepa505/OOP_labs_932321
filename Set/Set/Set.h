@@ -4,7 +4,7 @@
 
 class Set : private BoolVector 
 {
-
+public:
 	Set(const int lenght = CHAR_MAX, const char& value = 'a');
 	Set(const Set& other);
 	Set(const char* array);
