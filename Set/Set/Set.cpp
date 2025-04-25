@@ -78,7 +78,72 @@ bool Set::operator !=(const Set& other) const {
 	return !(*this == other);
 }
 
+Set Set::operator |(const Set& other) const {
+	Set result(*this);
+	result |= other;
+	return result;
+}
 
+Set& Set::operator |=(const Set& other) {
+	*this |= other;
+	return *this;
+}
+
+Set Set::operator &(const Set& other) const {
+	Set result(*this);
+	result &= other;
+	return result;
+}
+
+Set& Set::operator &=(const Set& other) {
+	*this &= other;
+	return *this;
+}
+
+Set Set::operator /(const Set& other) const {
+	Set result(*this);
+	result /= other;
+	return result;
+}
+
+Set& Set::operator /=(const Set& other) {
+	BoolVector::operator&(~other);
+	return *this;
+}
+
+Set Set::operator ~() const{
+	Set result(*this);
+	result.BoolVector::operator~();
+	return result;
+}
+
+Set Set::operator +(const char& value) const {
+	Set result(*this);
+	result += value;
+	return result;
+}
+
+Set& Set::operator +=(const char& value) {
+	if (0 <= value <= CHAR_MAX) {
+		if (!BoolVector::operator[]((int)value)) {
+			SetIndex((int)value, 1);
+		}
+	}
+}
+
+Set Set::operator -(const char& value) const {
+	Set result(*this);
+	result -= value;
+	return result;
+}
+
+Set& Set::operator -=(const char& value) {
+	if (0 <= value <= CHAR_MAX) {
+		if (BoolVector::operator[]((int)value)) {
+			SetIndex((int)value, 0);
+		}
+	}
+}
 
 
 
