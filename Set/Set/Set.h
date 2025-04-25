@@ -15,6 +15,20 @@ class Set : private BoolVector
 	char Max() const;
 	char Min() const;
 
+	Set& operator =(const Set& other);
+	bool operator ==(const Set& other) const;
+	bool operator !=(const Set& other) const;
+	Set operator |(const Set& other) const;
+	Set& operator |=(const Set& other);
+	Set operator &(const Set& other) const;
+	Set& operator &=(const Set& other);
+	Set operator /(const Set& other) const;
+	Set& operator /=(const Set& other);
+	Set operator ~();
+	Set operator +(const char& value) const;
+	Set& operator +=(const char& value);
+	Set operator -(const char& value) const;
+	Set& operator -=(const char& value);
 
-};
+ };
 
