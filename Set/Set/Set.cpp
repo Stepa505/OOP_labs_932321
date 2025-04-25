@@ -1,6 +1,6 @@
 #include "Set.h"
 
-Set::Set(const int lenght = CHAR_MAX + 1, const char& value) 
+Set::Set(const int lenght, const char& value) 
 	:BoolVector(lenght)
 {
 	if ((int)value < lenght - 1) {
@@ -14,7 +14,7 @@ Set::Set(const Set& other)
 }
 
 Set::Set(const char* array) 
-	:BoolVector(CHAR_MAX + 1)
+	:BoolVector(MAX_SIZE)
 {
 	for (int i = 0; array[i] != '\0'; ++i) {
 		SetIndex((int)array[i], 1);
@@ -22,25 +22,15 @@ Set::Set(const char* array)
 }
 
 bool Set::IsElementInSet(const char& element) const{
-	if (operator[]((int)element)) {
-		return true;
-	}
-	return false;
+	return (bool)operator[]((int)element);
 }
 
 int Set::Capacity() const {
 	return Weight();
 }
 
-/*не понимаю как проходить в Set по маске
-UC mask = 1 << CHAR_MAX - 1 - CellSize*(-i + CellSize);
-for (int i = CellSize - 1; i >= 0; --i) {
-	if(mask & )
-}
-*/
-
 char Set::Max() const{
-	for (int i = CHAR_MAX; i >=0 ; --i) {
+	for (int i = CHAR_MAX; i >= 0 ; --i) {
 		if (operator[](i)) {
 			return (char)i;
 		}
@@ -49,7 +39,7 @@ char Set::Max() const{
 }
 
 char Set::Min() const{
-	for (int i = 0; i <= CHAR_MAX; ++i) {
+	for (int i = 0; i < MAX_SIZE; ++i) {
 		if (operator[](i)) {
 			return (char)i;
 		}
@@ -66,7 +56,7 @@ bool Set::operator ==(const Set& other) const {
 	if (Capacity() != other.Capacity()) {
 		return false;
 	}
-	for (int i = 0; i < CHAR_MAX + 1; ++i) {
+	for (int i = 0; i < MAX_SIZE; ++i) {
 		if (operator[](i) != other.operator[](i)) {
 			return false;
 		}
@@ -85,7 +75,7 @@ Set Set::operator |(const Set& other) const {
 }
 
 Set& Set::operator |=(const Set& other) {
-	*this |= other;
+	this->BoolVector::operator |=(other);
 	return *this;
 }
 
@@ -96,7 +86,7 @@ Set Set::operator &(const Set& other) const {
 }
 
 Set& Set::operator &=(const Set& other) {
-	*this &= other;
+	this->BoolVector::operator &=(other);
 	return *this;
 }
 
@@ -125,10 +115,12 @@ Set Set::operator +(const char& value) const {
 
 Set& Set::operator +=(const char& value) {
 	if (0 <= value <= CHAR_MAX) {
-		if (!BoolVector::operator[]((int)value)) {
+		if (IsElementInSet(value)) {
 			SetIndex((int)value, 1);
 		}
 	}
+
+	return *this;
 }
 
 Set Set::operator -(const char& value) const {
@@ -139,10 +131,12 @@ Set Set::operator -(const char& value) const {
 
 Set& Set::operator -=(const char& value) {
 	if (0 <= value <= CHAR_MAX) {
-		if (BoolVector::operator[]((int)value)) {
+		if (!IsElementInSet(value)) {
 			SetIndex((int)value, 0);
 		}
 	}
+
+	return *this;
 }
 
 
