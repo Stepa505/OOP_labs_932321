@@ -1,10 +1,23 @@
 #include "Set.h"
 
-Set::Set(const int lenght = CHAR_MAX, const char& value) 
+Set::Set(const int lenght = CHAR_MAX + 1, const char& value) 
 	:BoolVector(lenght)
 {
-	if ((int)value < lenght) {
+	if ((int)value < lenght - 1) {
 		SetIndex((int)value, 1);
+	}
+}
+
+Set::Set(const Set& other)
+	:BoolVector(other)
+{
+}
+
+Set::Set(const char* array) 
+	:BoolVector(CHAR_MAX + 1)
+{
+	for (int i = 0; array[i] != '\0'; ++i) {
+		SetIndex((int)array[i], 1);
 	}
 }
 
