@@ -1,11 +1,9 @@
 #include "Set.h"
+#include <string.h>
 
-Set::Set(const int lenght, const char& value) 
-	:BoolVector(lenght)
+Set::Set() 
+	:BoolVector(MAX_SIZE, 0)
 {
-	if ((int)value < lenght - 1) {
-		SetIndex((int)value, 1);
-	}
 }
 
 Set::Set(const Set& other)
@@ -13,24 +11,29 @@ Set::Set(const Set& other)
 {
 }
 
-Set::Set(const char* array) 
-	:BoolVector(MAX_SIZE)
+Set::Set(const char* array, const int size) 
+	:BoolVector(MAX_SIZE, 0)
 {
-	for (int i = 0; array[i] != '\0'; ++i) {
+	for (int i = 0; i < size; ++i) {
 		SetIndex((int)array[i], 1);
 	}
 }
 
-bool Set::IsElementInSet(const char& element) const{
+Set::Set(const char* array)
+	:Set(array, strlen(array))
+{
+}
+
+bool Set::Contains(const char element) const{
 	return (bool)operator[]((int)element);
 }
 
-int Set::Capacity() const {
+int Set::Cardinalis () const {
 	return Weight();
 }
 
 char Set::Max() const{
-	for (int i = CHAR_MAX; i >= 0 ; --i) {
+	for (int i = MAX_SIZE - 1; i >= 0 ; --i) {
 		if (operator[](i)) {
 			return (char)i;
 		}
@@ -53,7 +56,7 @@ Set& Set::operator = (const Set& other) {
 }
 
 bool Set::operator ==(const Set& other) const {
-	if (Capacity() != other.Capacity()) {
+	if (Cardinalis() != other.Cardinalis()) {
 		return false;
 	}
 	for (int i = 0; i < MAX_SIZE; ++i) {
@@ -103,41 +106,40 @@ Set& Set::operator /=(const Set& other) {
 
 Set Set::operator ~() const{
 	Set result(*this);
-	result.BoolVector::operator~();
+	result.Inverse();
 	return result;
 }
 
-Set Set::operator +(const char& value) const {
+Set Set::operator +(const char value) const {
 	Set result(*this);
 	result += value;
 	return result;
 }
 
-Set& Set::operator +=(const char& value) {
-	if (0 <= value <= CHAR_MAX) {
-		if (IsElementInSet(value)) {
-			SetIndex((int)value, 1);
-		}
-	}
-
+Set& Set::operator +=(const char value) {
+	SetIndex((int)value, 1);
 	return *this;
 }
 
-Set Set::operator -(const char& value) const {
+Set Set::operator -(const char value) const {
 	Set result(*this);
 	result -= value;
 	return result;
 }
 
-Set& Set::operator -=(const char& value) {
-	if (0 <= value <= CHAR_MAX) {
-		if (!IsElementInSet(value)) {
-			SetIndex((int)value, 0);
-		}
-	}
-
+Set& Set::operator -=(const char value) {
+	SetIndex((int)value, 0);
 	return *this;
 }
 
-
+std::ostream& operator <<(std::ostream& stream, const Set& other) {
+	stream <<"{ ";
+	for (int i = 0; i < Set::MAX_SIZE; ++i) {
+		if (other.Contains((char)i)) {
+			stream << static_cast<char> (i) << ' ';
+		}
+	}
+	stream << '}';
+	return stream;
+}
 

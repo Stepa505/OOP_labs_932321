@@ -130,6 +130,7 @@
     <ClInclude Include="Set.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\BoolVector\BoolVector\BoolVector.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Set.cpp" />
   </ItemGroup>
