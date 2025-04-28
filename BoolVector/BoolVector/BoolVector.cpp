@@ -40,6 +40,14 @@ m_unsignificantRankCount(other.m_unsignificantRankCount)
 	}
 }
 
+BoolVector::~BoolVector() {
+	delete[] m_cells;
+}
+
+int BoolVector::GetLength() const{
+	return m_length;
+}
+
 void BoolVector::Swap(BoolVector& other) {
 	std::swap(m_length, other.m_length);
 	std::swap(m_cellCount, other.m_cellCount);
@@ -48,10 +56,8 @@ void BoolVector::Swap(BoolVector& other) {
 }
 
 void BoolVector::Inverse() {
-	UC mask = 0;
-	mask = ~mask;
 	for (int i = 0; i < m_cellCount; i++) {
-		m_cells[i] = ~(m_cells[i] & mask);
+		m_cells[i] = ~m_cells[i];
 	}
 	m_twich();
 }
@@ -110,7 +116,6 @@ int BoolVector::Weight() const{
 void BoolVector::Print() const {
 	UC mask = 1;
 	mask <<= 7;
-	//std::cout << "print start \n";
 	for (int j = 0; j < m_cellCount; j++) {
 		std::cout << "[ ";
 		for (int i = 0; i < m_cellSize; i++) {
@@ -143,10 +148,7 @@ BoolVector BoolVector::operator &(const BoolVector& other) const{
 }
 
 BoolVector& BoolVector::operator &=(const BoolVector& other) {
-	assert(m_length == other.m_length);
-	for (int i = 0; i < m_cellCount; i++) {
-		m_cells[i] &= other.m_cells[i];
-	}
+	*this = *this & other;
 	return *this;
 }
 
@@ -240,9 +242,7 @@ BoolVector& BoolVector::operator >>=(const int count) {
 
 BoolVector BoolVector::operator ~() const{
 	BoolVector result(*this);
-	for (int i = 0; i < m_cellCount; i++) {
-		result.m_cells[i] = ~m_cells[i];
-	}
+	result.Inverse();
 	return result;
 }
 
@@ -261,6 +261,11 @@ const BoolVector::BoolRank BoolVector::operator [](const int index) const{
 	assert(index >= 0 && index < m_length);
 	return BoolRank(&m_cells[index / m_cellSize], index % m_cellSize);
 }
+
+BoolVector::BoolRank::BoolRank(UC* cell, const int mask_pos) {
+	m_cell = cell;
+	m_mask >>= mask_pos;
+};
 
 BoolVector::BoolRank& BoolVector::BoolRank::operator =(const BoolRank& other) {
 	return *this = ((bool)other);
@@ -300,7 +305,7 @@ bool BoolVector::BoolRank::operator |(const bool value) const {
 	return (bool(*this) || !value);
 }
 
-bool BoolVector::BoolRank::operator ~() {
+bool BoolVector::BoolRank::operator ~() const{
 	return !(this->operator bool());
 }
 
@@ -331,8 +336,39 @@ BoolVector::BoolRank::operator bool() const {
 	return false;
 }
 
+std::ostream& operator <<(std::ostream& out, const BoolVector& vector) {
+	uint8_t mask = 1;
+	mask <<= 7;
+	for (int j = 0; j < vector.m_cellCount; j++) {
+		out << "[ ";
+		for (int i = 0; i < vector.m_cellSize; i++) {
+			if (vector.m_cells[j] & mask) out << "1 ";
+			else out << "0 ";
+			mask >>= 1;
+		}
+		mask = 1;
+		mask <<= 7;
+		out << ']';
+	}
+	std::cout << std::endl;
+	return out;
+}
 
-
-
-
-
+std::istream& operator >>(std::istream& in, BoolVector& vector) {
+	std::cout << "Eneter length of the vector: ";
+	in >> vector.m_length;
+	std::cout << std::endl;
+	std::cout << "Enter the vector, only 1 or 0: ";
+	bool value;
+	for (int i = 0; i < vector.m_length; i++) {
+		in >> value;
+		if (value) {
+			vector.SetIndex(i, 1);
+		}
+		else {
+			vector.SetIndex(i, 0);
+		}
+	}
+	std::cout << std::endl;
+	return in;
+}
