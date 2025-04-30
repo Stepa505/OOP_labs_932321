@@ -5,22 +5,22 @@
 #include <string>
 #include <vector>
 
-//#include "C:\OOP_labs_932321\Array\Array\Array.h"
+#include "..\..\Array\Array\Array.h"
 
 template <typename Type>
 class List
 {
 public:
 	template <typename IT, typename LT>
-	class TmpIterator;
-	using Iterator = TmpIterator<Type, List>;
-	using ConstIterator = TmpIterator<const Type, const List>;
+	class TmplIterator;
+	using Iterator = TmplIterator<Type, List>;
+	using ConstIterator = TmplIterator<const Type, const List>;
 public:
 	class Node;
 public:
 	List(const int size = 0, const Type& value = Type());
 	List(const List& other);
-	//List(const Array<Type>& arr);
+	List(const Array<Type>& arr);
 	~List() = default;
 
 	void swap(List& other);
@@ -42,15 +42,15 @@ public:
 	void pushFront(const Type& value);
 	void pushPosition(const Type& value, const int pos);
 	void pushAfterKey(const Type& value, const int key);
-	void pushOnIterator(Iterator& it, const Type& value);
+	void pushOnIterator(Iterator it, const Type& value);
 
 	void popBack();
 	void popFront();
 	void popPosition(const int pos);
 	void popAfterKey(const Type& key);
-	void popOnIterator(Iterator& it);
+	void popOnIterator(Iterator it);
 
-	void deleteInRange(Iterator& start, Iterator& end);
+	void deleteInRange(Iterator start, Iterator end);
 
 	Type& max() const;
 	Type& min() const;
@@ -86,22 +86,31 @@ private:
 	Type m_value = Type();
 };
 
+template <typename Type>
+std::ostream& operator <<(std::ostream& stream, const List<Type>& other);
+template <typename Type>
+std::istream& operator >>(std::istream& stream, List<Type>& other);
+
 template<typename Type>
 template<typename IT, typename LT>
-class List<Type>::TmpIterator {
+class List<Type>::TmplIterator {
 public:
-	TmpIterator(LT* list = nullptr, Node* node = nullptr);
+	TmplIterator(LT* list = nullptr, Node* node = nullptr);
 
 	IT& operator*();
 	const IT& operator*()const;
 
-	TmpIterator& operator++();
-	TmpIterator& operator--();
-	TmpIterator operator++(int);
-	TmpIterator operator--(int);
+	Node* getNode() {
+		return m_node;
+	}
 
-	bool operator==(const TmpIterator& other)const;
-	bool operator!=(const TmpIterator& other)const;
+	TmplIterator& operator++();
+	TmplIterator& operator--();
+	TmplIterator operator++(int);
+	TmplIterator operator--(int);
+
+	bool operator==(const TmplIterator& other)const;
+	bool operator!=(const TmplIterator& other)const;
 private:
 	LT* m_list = nullptr;
 	Node* m_node = nullptr;

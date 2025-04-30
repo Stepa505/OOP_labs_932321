@@ -25,6 +25,14 @@ m_tail(other.m_tail)
 }
 
 template <typename Type>
+List<Type>::List(const Array<Type>& arr) {
+	makeEmptyList();
+	for (int i = 0; i < arr.Size(); ++i) {
+		pushBack(arr[i]);
+	}
+}
+
+template <typename Type>
 void List<Type>::swap(List& other) {
 	std::swap(m_nodeCount, other.m_nodeCount);
 	std::swap(m_tail, other.m_tail);
@@ -36,7 +44,7 @@ int List<Type>::findValue(const Type& key) {
 	auto it = Begin();
 	while (it != End())
 	{
-		if (*it == value)
+		if (*it == key)
 			return it;
 		++it;
 	}
@@ -72,22 +80,22 @@ void List<Type>::clear() {
 
 template <typename Type> typename
 List<Type>::Iterator List<Type>::Begin(){
-	return Iterator(m_head->m_next, *this);
+	return Iterator(this, m_head->m_next);
 }
 
 template <typename Type> typename
 List<Type>::Iterator List<Type>::End() {
-	return Iterator(m_tail, *this);
+	return Iterator(this, m_tail);
 }
 
 template <typename Type> typename
 List<Type>::ConstIterator List<Type>::Begin() const{
-	return Iterator(m_head->m_next, *this);
+	return Iterator(this, m_head->m_next);
 }
 
 template <typename Type> typename
 List<Type>::ConstIterator List<Type>::End() const{
-	return Iterator(m_tail, *this);
+	return Iterator(this, m_tail);
 }
 
 template <typename Type> typename
@@ -122,7 +130,7 @@ void List<Type>::pushAfterKey(const Type& value, const int key) {
 }
 
 template <typename Type>
-void List<Type>::pushOnIterator(Iterator& it, const Type& value) {
+void List<Type>::pushOnIterator(Iterator it, const Type& value) {
 	insertNode(it, value);
 }
 
@@ -164,14 +172,14 @@ void List<Type>::popAfterKey(const Type& key) {
 }
 
 template <typename Type>
-void List<Type>::popOnIterator(Iterator& it) {
+void List<Type>::popOnIterator(Iterator it) {
 	if (it != End()) {
 		deleteNode(it);
 	}
 }
 
 template <typename Type>
-void List<Type>::deleteInRange(Iterator& start, Iterator& end) {
+void List<Type>::deleteInRange(Iterator start, Iterator end) {
 	auto it = start;
 	if (it != End()) {
 		while (start != end) {
@@ -186,7 +194,7 @@ template <typename Type>
 Type& List<Type>::max() const {
 	assert(!isEmpty());
 	Type& maxVal = m_head->m_next->m_value;
-	while (auto it = Begin(); it != End(); it++) {
+	for (auto it = Begin(); it != End(); it++) {
 		if (*it > maxVal) {
 			maxVal = *it;
 		}
@@ -198,7 +206,7 @@ template <typename Type>
 Type& List<Type>::min() const {
 	assert(!isEmpty());
 	Type& minVal = m_head->m_next->m_value;
-	while (auto it = Begin(); it != End(); it++) {
+	for (auto it = Begin(); it != End(); it++) {
 		if (it.m_node->m_value < minVal) {
 			minVal = *it;
 		}
@@ -229,21 +237,21 @@ void List<Type>::makeEmptyList() {
 template<typename Type>
 void List<Type>::deleteNode(Iterator& it)
 {
-	it.m_node->m_next->m_prev = it.m_node->m_prev;
-	it.m_node->m_prev->m_next = it.m_node->m_next;
-	delete it.m_node;
-	m_countNode--;
+	it.getNode()->m_next->m_prev = it.getNode()->m_prev;
+	it.getNode()->m_prev->m_next = it.getNode()->m_next;
+	delete it.getNode();
+	m_nodeCount--;
 }
 
 template <typename Type>
 void List<Type>::insertNode(Iterator& it, const Type& value) {
 	Node* newNode = new Node;
 	newNode->m_value = value;
-	newNode->m_next = it.m_node;
-	newNode->m_prev = it.m_node->m_prev;
-	it.m_node->m_prev->m_next = newNode;
-	it.m_node->m_prev = newNode;
-	m_countNode++;
+	newNode->m_next = it.getNode();
+	newNode->m_prev = it.getNode()->m_prev;
+	it.getNode()->m_prev->m_next = newNode;
+	it.getNode()->m_prev = newNode;
+	m_nodeCount++;
 }
 
 template <typename Type>
@@ -304,66 +312,84 @@ bool List<Type>::operator !=(const List& other) const {
 
 template <typename Type>
 template <typename IT, typename LT>
-List<Type>::TmpIterator<IT, LT>::TmpIterator(LT* list, Node* node) {
+List<Type>::TmplIterator<IT, LT>::TmplIterator(LT* list, Node* node) {
 	m_node = node;
 	m_list = list;
 }
 
 template <typename Type>
 template <typename IT, typename LT>
-IT& List<Type>::TmpIterator<IT, LT>::operator *() {
+IT& List<Type>::TmplIterator<IT, LT>::operator *() {
 	assert(m_node != nullptr);
 	return m_node->m_value;
 }
 
 template <typename Type>
 template <typename IT, typename LT>
-const IT& List<Type>::TmpIterator<IT, LT>::operator *() const{
+const IT& List<Type>::TmplIterator<IT, LT>::operator *() const{
 	assert(m_node != nullptr);
 	return m_node->m_value;
 }
 
 template <typename Type>
 template <typename IT, typename LT> typename
-List<Type>::TmpIterator<IT, LT>& List<Type>::TmpIterator<IT, LT>::operator++() {
+List<Type>::TmplIterator<IT, LT>& List<Type>::TmplIterator<IT, LT>::operator++() {
 	m_node = m_node->m_next;
 	return *this;
 }
 
 template <typename Type>
 template <typename IT, typename LT> typename
-List<Type>::TmpIterator<IT, LT>& List<Type>::TmpIterator<IT, LT>::operator--() {
+List<Type>::TmplIterator<IT, LT>& List<Type>::TmplIterator<IT, LT>::operator--() {
 	m_node = m_node->m_prev;
 	return *this;
 }
 
 template <typename Type>
 template <typename IT, typename LT> typename
-List<Type>::TmpIterator<IT, LT> List<Type>::TmpIterator<IT, LT>::operator++(int) {
-	TmpIterator<IT, LT> old(m_list, m_node);
+List<Type>::TmplIterator<IT, LT> List<Type>::TmplIterator<IT, LT>::operator++(int) {
+	TmplIterator<IT, LT> old(m_list, m_node);
 	m_node = m_node->m_next;
 	return old;
 }
 
 template <typename Type>
 template <typename IT, typename LT> typename
-List<Type>::TmpIterator<IT, LT> List<Type>::TmpIterator<IT, LT>::operator--(int) {
-	TmpIterator<IT, LT> old(m_list, m_node);
+List<Type>::TmplIterator<IT, LT> List<Type>::TmplIterator<IT, LT>::operator--(int) {
+	TmplIterator<IT, LT> old(m_list, m_node);
 	m_node = m_node->m_prev;
 	return old;
 }
 
 template <typename Type>
 template <typename IT, typename LT>
-bool List<Type>::TmpIterator<IT, LT>::operator==(const TmpIterator& other) const {
+bool List<Type>::TmplIterator<IT, LT>::operator==(const TmplIterator& other) const {
 	assert(m_list == other.m_list);
 	return (m_node == other.m_node && m_list == other.m_list);
 }
 
 template <typename Type>
 template <typename IT, typename LT>
-bool List<Type>::TmpIterator<IT, LT>::operator!=(const TmpIterator& other) const {
+bool List<Type>::TmplIterator<IT, LT>::operator!=(const TmplIterator& other) const {
 	return (*this == other);
+}
+
+template <typename Type>
+std::ostream& operator <<(std::ostream & stream, const List<Type> & other) {
+	stream << "HEAD ";
+	for (int i = 0; i < other.getSize(); ++i) {
+		stream << other[i];
+	 }
+	stream << " TAIL\n";
+	return stream;
+}
+
+template <typename Type>
+std::istream& operator >>(std::istream& stream, List<Type>& other) {
+	for (int i = 0; i < other.getSize(); ++i) {
+		stream >> other[i];
+	}
+	return stream;
 }
 
 #endif
