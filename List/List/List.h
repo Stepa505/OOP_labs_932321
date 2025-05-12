@@ -5,28 +5,28 @@
 #include <string>
 #include <vector>
 
-//#include "C:\OOP_labs_932321\Array\Array\Array.h"
+#include "..\..\Array\Array\Array.h"
 
 template <typename Type>
 class List
 {
 public:
 	template <typename IT, typename LT>
-	class TmpIterator;
-	using Iterator = TmpIterator<Type, List>;
-	using ConstIterator = TmpIterator<const Type, const List>;
+	class TmplIterator;
+	using Iterator = TmplIterator<Type, List>;
+	using ConstIterator = TmplIterator<const Type, const List>;
 public:
 	class Node;
 public:
 	List(const int size = 0, const Type& value = Type());
 	List(const List& other);
-	//List(const Array<Type>& arr);
-	~List() = default;
+	List(const Array<Type>& arr);
+	~List();
 
 	void swap(List& other);
 
 	int getSize() const;
-	int findValue(const Type& key);
+	Iterator findValue(const Type& key);
 
 	void clear();
 	bool isEmpty() const;
@@ -50,7 +50,7 @@ public:
 	void popAfterKey(const Type& key);
 	void popOnIterator(Iterator& it);
 
-	void deleteInRange(Iterator& start, Iterator& end);
+	void deleteInRange(const int start, const int end);
 
 	Type& max() const;
 	Type& min() const;
@@ -88,20 +88,24 @@ private:
 
 template<typename Type>
 template<typename IT, typename LT>
-class List<Type>::TmpIterator {
+class List<Type>::TmplIterator {
 public:
-	TmpIterator(LT* list = nullptr, Node* node = nullptr);
+	TmplIterator(LT* list = nullptr, Node* node = nullptr);
 
 	IT& operator*();
 	const IT& operator*()const;
 
-	TmpIterator& operator++();
-	TmpIterator& operator--();
-	TmpIterator operator++(int);
-	TmpIterator operator--(int);
+	Node* getNode() {
+		return m_node;
+	}
 
-	bool operator==(const TmpIterator& other)const;
-	bool operator!=(const TmpIterator& other)const;
+	TmplIterator& operator++();
+	TmplIterator& operator--();
+	TmplIterator operator++(int);
+	TmplIterator operator--(int);
+
+	bool operator==(const TmplIterator& other)const;
+	bool operator!=(const TmplIterator& other)const;
 private:
 	LT* m_list = nullptr;
 	Node* m_node = nullptr;
