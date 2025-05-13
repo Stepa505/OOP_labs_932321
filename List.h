@@ -21,16 +21,12 @@ public:
 	List(const int size = 0, const Type& value = Type());
 	List(const List& other);
 	List(const Array<Type>& arr);
-<<<<<<< HEAD
-	~List();
-=======
 	~List() = default;
->>>>>>> main
 
 	void swap(List& other);
 
 	int getSize() const;
-	Iterator findValue(const Type& key);
+	int findValue(const Type& key);
 
 	void clear();
 	bool isEmpty() const;
@@ -54,11 +50,7 @@ public:
 	void popAfterKey(const Type& key);
 	void popOnIterator(Iterator it);
 
-<<<<<<< HEAD
-	void deleteInRange(const int start, const int end);
-=======
 	void deleteInRange(Iterator start, Iterator end);
->>>>>>> main
 
 	Type& max() const;
 	Type& min() const;
@@ -111,21 +103,12 @@ public:
 	Node* getNode() {
 		return m_node;
 	}
-<<<<<<< HEAD
 
 	TmplIterator& operator++();
 	TmplIterator& operator--();
 	TmplIterator operator++(int);
 	TmplIterator operator--(int);
 
-=======
-
-	TmplIterator& operator++();
-	TmplIterator& operator--();
-	TmplIterator operator++(int);
-	TmplIterator operator--(int);
-
->>>>>>> main
 	bool operator==(const TmplIterator& other)const;
 	bool operator!=(const TmplIterator& other)const;
 private:

@@ -17,25 +17,11 @@ List<Type>::List(const int size, const Type& value) {
 }
 
 template <typename Type>
-List<Type>::List(const List& other) {
-	makeEmptyList();
-	for (auto it = other.Begin(); it != other.End(); ++it) {
-		pushBack(*it);
-	}
-}
-
-template<typename Type>
-List<Type>::List(const Array<Type>&arr) {
-	for (int i = 0; i < arr.Size(); ++i) {
-		pushBack(arr[i]);
-	}
-}
-
-template <typename Type>
-List<Type>::~List() {
-	clear();
-	delete m_head;
-	delete m_tail;
+List<Type>::List(const List& other) 
+:m_nodeCount(other.m_nodeCount),
+m_head(other.m_head),
+m_tail(other.m_tail)
+{
 }
 
 template <typename Type>
@@ -50,25 +36,19 @@ template <typename Type>
 void List<Type>::swap(List& other) {
 	std::swap(m_nodeCount, other.m_nodeCount);
 	std::swap(m_tail, other.m_tail);
-	std::swap(m_head, other.m_head);
+	std::swap(m_head, other,m_head);
 }
 
-
 template<typename Type>
-<<<<<<< HEAD
-typename List<Type>::Iterator List<Type>::findValue(const Type& key) {
-	for (auto it = Begin(); it != End(); ++it) {
-		if (*it == key) 
-=======
 int List<Type>::findValue(const Type& key) {
 	auto it = Begin();
 	while (it != End())
 	{
 		if (*it == key)
->>>>>>> main
 			return it;
+		++it;
 	}
-	return End();
+	return *it;
 }
 
 template <typename Type>
@@ -93,15 +73,9 @@ bool List<Type>::isEmpty() const {
 
 template <typename Type>
 void List<Type>::clear() {
-	Node* current = m_head->m_next;
-	while (current != m_tail) {
-		Node* next = current->m_next;
-		delete current;
-		current = next;
+	while (!isEmpty) {
+		popBack();
 	}
-	m_head->m_next = m_tail;
-	m_tail->m_prev = m_head;
-	m_nodeCount = 0;
 }
 
 template <typename Type> typename
@@ -116,20 +90,12 @@ List<Type>::Iterator List<Type>::End() {
 
 template <typename Type> typename
 List<Type>::ConstIterator List<Type>::Begin() const{
-<<<<<<< HEAD
-	return ConstIterator(this ,m_head->m_next);
-=======
 	return Iterator(this, m_head->m_next);
->>>>>>> main
 }
 
 template <typename Type> typename
 List<Type>::ConstIterator List<Type>::End() const{
-<<<<<<< HEAD
-	return ConstIterator(this, m_tail);
-=======
 	return Iterator(this, m_tail);
->>>>>>> main
 }
 
 template <typename Type> typename
@@ -141,12 +107,11 @@ void List<Type>::pushBack(const Type& value) {
 template <typename Type>
 void List<Type>::pushFront(const Type& value) {
 	auto it = Begin();
-	insertNode(it, value);
+	insertNode(--it, value);
 }
 
 template<typename Type>
 void List<Type>::pushPosition(const Type& value, const int pos) {
-	assert(pos >= 0 && pos < m_nodeCount);
 	auto it = Begin();
 	for (int i = 0; i < pos; i++) {
 		it++;
@@ -156,9 +121,10 @@ void List<Type>::pushPosition(const Type& value, const int pos) {
 
 template <typename Type>
 void List<Type>::pushAfterKey(const Type& value, const int key) {
-	auto it = findValue(key);
-	++it;
-	if (it != End()) {
+	auto* it = findValue(key);
+	it++;
+	if (it != End())
+	{
 		insertNode(it, value);
 	}
 }
@@ -170,7 +136,7 @@ void List<Type>::pushOnIterator(Iterator it, const Type& value) {
 
 template <typename Type>
 void List<Type>::popBack() {
-	if (!isEmpty()) {
+	if (!isEmpty) {
 		auto it = End();
 		it--;
 		deleteNode(it);
@@ -179,7 +145,7 @@ void List<Type>::popBack() {
 
 template <typename Type>
 void List<Type>::popFront() {
-	if (!isEmpty()) {
+	if (!isEmpty) {
 		auto it = Begin();
 		deleteNode(it);
 	}
@@ -198,7 +164,7 @@ void List<Type>::popPosition(const int pos) {
 
 template <typename Type>
 void List<Type>::popAfterKey(const Type& key) {
-	auto it = findValue(key);
+	auto* it = findValue(key);
 	if (it != End())
 	{
 		deleteNode(it);
@@ -213,13 +179,6 @@ void List<Type>::popOnIterator(Iterator it) {
 }
 
 template <typename Type>
-<<<<<<< HEAD
-void List<Type>::deleteInRange(const int start, const int end) {
-	assert(start >=0 && end < m_nodeCount);
-	for (int i = start; i < end; ++i) {
-		popPosition(i);
-	}	
-=======
 void List<Type>::deleteInRange(Iterator start, Iterator end) {
 	auto it = start;
 	if (it != End()) {
@@ -229,7 +188,6 @@ void List<Type>::deleteInRange(Iterator start, Iterator end) {
 			popOnIterator(it);
 		}
 	}
->>>>>>> main
 }
 
 template <typename Type>
@@ -249,11 +207,7 @@ Type& List<Type>::min() const {
 	assert(!isEmpty());
 	Type& minVal = m_head->m_next->m_value;
 	for (auto it = Begin(); it != End(); it++) {
-<<<<<<< HEAD
-		if (it.getNode()->m_value < minVal) {
-=======
 		if (it.m_node->m_value < minVal) {
->>>>>>> main
 			minVal = *it;
 		}
 	}
@@ -262,12 +216,10 @@ Type& List<Type>::min() const {
 
 template<typename Type>
 void List<Type>::sort(){
-	if (m_nodeCount > 1) {
-		for (auto it = Begin(); it != End(); it++) {
-			for (auto jt = Begin(); jt != End(); jt++) {
-				if (*it < *jt) {
-					std::swap(it.getNode()->m_value, jt.getNode()->m_value);
-				}
+	for (auto it = Begin(); it != End(); it++) {
+		for (auto jt = Begin(); jt != End(); jt++) {
+			if (*it < *jt) {
+				std::swap(it.m_node->m_value, jt.m_node->m_value);
 			}
 		}
 	}
@@ -283,13 +235,8 @@ void List<Type>::makeEmptyList() {
 }
 
 template<typename Type>
-<<<<<<< HEAD
-void List<Type>::deleteNode(Iterator& it){
-	assert(!isEmpty());
-=======
 void List<Type>::deleteNode(Iterator& it)
 {
->>>>>>> main
 	it.getNode()->m_next->m_prev = it.getNode()->m_prev;
 	it.getNode()->m_prev->m_next = it.getNode()->m_next;
 	delete it.getNode();
@@ -309,9 +256,8 @@ void List<Type>::insertNode(Iterator& it, const Type& value) {
 
 template <typename Type>
 Type& List<Type>::operator [](const int index) {
-	assert(index >= 0 && index < m_nodeCount);
-	Node* tmp = m_head->m_next;
-	for (int i = 0; i < index; ++i) {
+	Node* tmp = new Node;
+	for (int i = 0; i < index; i++) {
 		tmp = tmp->m_next;
 	}
 	return tmp->m_value;
@@ -319,9 +265,8 @@ Type& List<Type>::operator [](const int index) {
 
 template <typename Type> 
 const Type& List<Type>::operator [](const int index) const{
-	assert(index >= 0 && index < m_nodeCount);
-	Node* tmp = m_head->m_next;
-	for (int i = 0; i < index; ++i) {
+	Node* tmp = new Node;
+	for (int i = 0; i < index; i++) {
 		tmp = tmp->m_next;
 	}
 	return tmp->m_value;
@@ -329,11 +274,14 @@ const Type& List<Type>::operator [](const int index) const{
 
 template <typename Type>
 List<Type>& List<Type>::operator =(const List& other) {
+	List<Type> tmp;
 	if (m_head == other.m_head && m_tail == other.m_tail) {
 		return *this;
 	}
-	List<Type> tmp(other);
-	swap(tmp);
+	clear();
+	for (const Type& value : other) {
+		pushBack(value);
+	}
 	return *this;
 }
 
