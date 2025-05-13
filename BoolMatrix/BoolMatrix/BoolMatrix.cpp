@@ -1,5 +1,6 @@
 #include "BoolMatrix.h"
 
+#include <assert.h>
 #include <vector>
 #include <iostream>
 
@@ -7,8 +8,9 @@ BoolMatrix::BoolMatrix(const int column_count, const int row_count, const bool v
 :m_columnCount(column_count),
 m_rowCount(row_count)
 {
+    m_rows = new BoolVector[m_rowCount];
 	for (int i = 0; i < m_rowCount; i++) {
-		m_rows->SetAll(value);
+		m_rows[i].SetAll(value);
 	}
 }
 
@@ -23,7 +25,6 @@ BoolMatrix::BoolMatrix(const char** matrix, const int row_count, const int colum
     m_columnCount = row_count;
     m_rowCount = column_count;
     m_rows = new BoolVector[m_rowCount];
-
     for (int i = 0; i < m_rowCount; ++i) {
         m_rows[i] = matrix[i];
     }
@@ -100,7 +101,7 @@ void BoolMatrix::setRowIndex(int row_count, int index, bool value) {
 }
 
 void BoolMatrix::setRowIndexFrom(int row_count, int start_index, const bool value) {
-    for (int i = start_index; i < m_rows[row_count].GetLength(); i++) {
+    for (int i = start_index; i < m_columnCount; i++) {
         setRowIndex(row_count, i, value);
     }
 }
@@ -126,9 +127,7 @@ BoolMatrix& BoolMatrix::operator &=(const BoolMatrix& other) {
 
 BoolMatrix BoolMatrix::operator &(const BoolMatrix& other) const {
     BoolMatrix matrix(*this);
-    for (int i = 0; i < m_rowCount; i++) {
-        matrix.m_rows[i] &= other.m_rows[i];
-    }
+    matrix &= other;
     return matrix;
 }
 
@@ -143,9 +142,7 @@ BoolMatrix& BoolMatrix::operator |=(const BoolMatrix& other) {
 
 BoolMatrix BoolMatrix::operator |(const BoolMatrix& other) const {
     BoolMatrix matrix(*this);
-    for (int i = 0; i < m_rowCount; i++) {
-        matrix.m_rows[i] |= other.m_rows[i];
-    }
+    matrix |= other;
     return matrix;
 }
 
@@ -160,9 +157,7 @@ BoolMatrix& BoolMatrix::operator ^=(const BoolMatrix& other) {
 
 BoolMatrix BoolMatrix::operator ^(const BoolMatrix& other) const {
     BoolMatrix matrix(*this);
-    for (int i = 0; i < m_rowCount; i++) {
-        matrix.m_rows[i] ^= other.m_rows[i];
-    }
+    matrix ^= other;
     return matrix;
 }
 
@@ -175,16 +170,22 @@ BoolMatrix BoolMatrix::operator ~() {
 }
 
 std::istream& operator >> (std::istream& stream, BoolMatrix& other) {
-    for (int i = 0; i < other.getColumnCount(); ++i) {
-        stream >> other[i];
+    bool a = false;
+    for (int i = 0; i < other.getRowCount(); ++i) {
+        for (int j = 0; j < other.getColumnCount(); ++j) {
+            stream >> a;
+            other[i][j] = a;
+            std::cout << a << '|';
+        }
+        std::cout << '\n';
     }
     return stream;
 }
 
 std::ostream& operator << (std::ostream& stream, const BoolMatrix& other) {
-    for (int i = 0; i < other.getColumnCount(); ++i) {
+    for (int i = 0; i < other.getRowCount(); ++i) {
         stream << "|";
-        for (int j = 0; j < other.getRowCount(); ++j) {
+        for (int j = 0; j < other.getColumnCount(); ++j) {
             stream << other[i][j] << ((j + 1) < other.getRowCount() ? " " : "");
         }
         stream << "|" << std::endl;
