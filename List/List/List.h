@@ -21,11 +21,7 @@ public:
 	List(const int size = 0, const Type& value = Type());
 	List(const List& other);
 	List(const Array<Type>& arr);
-<<<<<<< HEAD
 	~List();
-=======
-	~List() = default;
->>>>>>> main
 
 	void swap(List& other);
 
@@ -37,28 +33,24 @@ public:
 
 	void print() const;
 
-	Iterator Begin();
-	Iterator End();
-	ConstIterator Begin() const;
-	ConstIterator End() const;
+	Iterator begin();
+	Iterator end();
+	ConstIterator begin() const;
+	ConstIterator end() const;
 
 	void pushBack(const Type& value);
 	void pushFront(const Type& value);
 	void pushPosition(const Type& value, const int pos);
-	void pushAfterKey(const Type& value, const int key);
+	void pushAfterKey(const Type& value, const int key); //FIX findValue();
 	void pushOnIterator(Iterator it, const Type& value);
 
 	void popBack();
 	void popFront();
 	void popPosition(const int pos);
-	void popAfterKey(const Type& key);
-	void popOnIterator(Iterator it);
+	void popAfterKey(const Type& key); //FIX findValue();
+	void popOnIterator(Iterator it); //FIXME
 
-<<<<<<< HEAD
 	void deleteInRange(const int start, const int end);
-=======
-	void deleteInRange(Iterator start, Iterator end);
->>>>>>> main
 
 	Type& max() const;
 	Type& min() const;
@@ -76,8 +68,8 @@ public:
 	bool operator !=(const List& other) const;
 private:
 	void makeEmptyList();
-	void insertNode(Iterator& it, const Type& value);
-	void deleteNode(Iterator& it);
+	void insertNode(Iterator it, const Type& value);
+	void deleteNode(Iterator it);
 
 	int m_nodeCount = 0;
 	Node* m_head = nullptr;
@@ -103,29 +95,18 @@ template<typename Type>
 template<typename IT, typename LT>
 class List<Type>::TmplIterator {
 public:
+	friend List;
+public:
 	TmplIterator(LT* list = nullptr, Node* node = nullptr);
 
 	IT& operator*();
 	const IT& operator*()const;
 
-	Node* getNode() {
-		return m_node;
-	}
-<<<<<<< HEAD
-
 	TmplIterator& operator++();
 	TmplIterator& operator--();
 	TmplIterator operator++(int);
 	TmplIterator operator--(int);
 
-=======
-
-	TmplIterator& operator++();
-	TmplIterator& operator--();
-	TmplIterator operator++(int);
-	TmplIterator operator--(int);
-
->>>>>>> main
 	bool operator==(const TmplIterator& other)const;
 	bool operator!=(const TmplIterator& other)const;
 private:
